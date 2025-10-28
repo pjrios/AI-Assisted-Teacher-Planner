@@ -5,9 +5,12 @@ from pathlib import Path
 from ..schemas import YearlyPlan, YearlyPlanIngestionResult
 from .chunker import chunk_yearly_plan
 from .docx_parser import parse_yearly_plan_docx
+from .pdf_parser import parse_yearly_plan_pdf
+from .pptx_parser import parse_yearly_plan_pptx
+from .text_parser import parse_yearly_plan_from_lines
 
 
-SUPPORTED_EXTENSIONS = {".docx"}
+SUPPORTED_EXTENSIONS = {".docx", ".pdf", ".pptx", ".txt", ".md"}
 
 
 def ingest_yearly_plan(path: Path) -> YearlyPlanIngestionResult:
@@ -18,6 +21,13 @@ def ingest_yearly_plan(path: Path) -> YearlyPlanIngestionResult:
     structured: YearlyPlan
     if extension == ".docx":
         structured = parse_yearly_plan_docx(path)
+    elif extension == ".pdf":
+        structured = parse_yearly_plan_pdf(path)
+    elif extension == ".pptx":
+        structured = parse_yearly_plan_pptx(path)
+    elif extension in {".txt", ".md"}:
+        lines = path.read_text(encoding="utf-8").splitlines()
+        structured = parse_yearly_plan_from_lines(lines)
     else:
         raise ValueError(f"Unsupported file extension: {extension}")
 

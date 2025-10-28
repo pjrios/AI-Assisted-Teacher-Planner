@@ -10,7 +10,10 @@ class Settings(BaseSettings):
         env="DATABASE_URL",
     )
     chroma_persist_directory: str = Field(default="./.chroma")
-    embedding_model: str = Field(default="text-embedding-3-large")
+    embedding_model: str = Field(default="sentence-transformers/all-MiniLM-L6-v2")
+    embedding_device: str | None = Field(default=None)
+    embedding_batch_size: int = Field(default=32)
+    embedding_normalize: bool = Field(default=True)
 
     class Config:
         env_file = ".env"

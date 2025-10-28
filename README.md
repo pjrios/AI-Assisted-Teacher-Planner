@@ -6,12 +6,14 @@ extract yearly plans, embed their content, and generate lesson agendas.
 
 ## Features
 
-- **Yearly plan ingestion** – Upload `.docx` files and convert them into a normalized JSON
-  representation ready for relational storage.
+- **Yearly plan ingestion** – Upload `.docx`, `.pdf`, `.pptx`, `.txt`, or `.md` files and
+  convert them into a normalized JSON representation ready for relational storage.
 - **Vector database integration** – Automatically chunk each learning area and store
-  embeddings with metadata in a persistent Chroma collection.
+  locally generated embeddings (via SentenceTransformers) with metadata in a persistent
+  Chroma collection.
 - **Lesson generation service** – Retrieve the most relevant context for a topic and prompt
-  the OpenAI Responses API to create pre/while/post lesson activities.
+  the OpenAI Responses API to create pre/while/post lesson activities (optional; requires an
+  OpenAI API key).
 - **FastAPI backend** – A lightweight API layer exposing health checks, ingestion, and
   lesson-generation endpoints.
 
@@ -51,7 +53,7 @@ requirements.txt    # Python dependencies
    Update the `.env` file with:
 
    - `DATABASE_URL` – PostgreSQL connection string.
-   - `OPENAI_API_KEY` – API key used for embeddings and lesson generation.
+   - `OPENAI_API_KEY` – API key used for lesson generation (optional for ingestion).
    - `CHROMA_PERSIST_DIRECTORY` – Optional override for Chroma storage.
 
 3. **Run the API server**
@@ -75,14 +77,15 @@ requirements.txt    # Python dependencies
 
    The script prints the structured plan (or writes it to `--output-json`) and confirms the
    number of chunks saved to the configured Chroma collection. Ensure that the
-   `DATABASE_URL` points to a reachable PostgreSQL instance and that `OPENAI_API_KEY` is
-   populated; the pipeline will stop with a clear error if either requirement is missing.
+   `DATABASE_URL` points to a reachable PostgreSQL instance. An `OPENAI_API_KEY` is only
+   necessary when you intend to call the lesson generation endpoints.
 
 ## Key Workflows
 
 ### Ingest a yearly plan
 
-Send a multipart request to `/plans/ingest` with the `.docx` file. The server will:
+Send a multipart request to `/plans/ingest` with a `.docx`, `.pdf`, `.pptx`, `.txt`, or
+`.md` file. The server will:
 
 1. Parse the document into structured trimesters, areas, and learning artifacts.
 2. Generate semantic chunks and embeddings.
@@ -101,6 +104,6 @@ returns structured sessions ready to be saved as class and activity records.
 ## Next Steps
 
 - Connect the CRUD utilities to persistence workflows for levels, trimesters, and topics.
-- Expand the ingestion pipeline to handle `.pdf` and `.xlsx` files.
+- Add ingestion support for spreadsheet formats such as `.xlsx`.
 - Add background tasks for long-running embedding jobs and lesson generation.
 - Build the React/Tailwind front-end and integrate with the FastAPI backend.
