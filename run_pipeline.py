@@ -33,13 +33,7 @@ def _persist_vector_chunks(
 
 
 def _bootstrap_environment() -> None:
-    settings = get_settings()
-
-    if not settings.openai_api_key:
-        raise RuntimeError(
-            "OPENAI_API_KEY must be configured before running the ingestion pipeline."
-        )
-
+    get_settings()  # ensure settings are loaded for downstream components
     print("⚙️ Ensuring database schema exists...", flush=True)
     init_database()
     print("✅ Database ready.")
@@ -55,7 +49,10 @@ def main() -> None:
     parser.add_argument(
         "plan_path",
         type=Path,
-        help="Path to the yearly plan document (.docx) that should be ingested.",
+        help=(
+            "Path to the yearly plan document (.docx/.pdf/.pptx/.txt/.md) that should be "
+            "ingested."
+        ),
     )
     parser.add_argument(
         "--output-json",
