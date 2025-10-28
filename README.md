@@ -62,6 +62,19 @@ requirements.txt    # Python dependencies
 
    Visit `http://localhost:8000/docs` to explore the interactive API documentation.
 
+4. **Ingest a plan with one command**
+
+   Once your environment variables are configured, the `run_pipeline.py` script handles
+   parsing a yearly plan, exporting the normalized JSON, and storing semantic chunks in
+   Chroma:
+
+   ```bash
+   python run_pipeline.py path/to/plan.docx --output-json data/plan.json
+   ```
+
+   The script prints the structured plan (or writes it to `--output-json`) and confirms the
+   number of chunks saved to the configured Chroma collection.
+
 ## Key Workflows
 
 ### Ingest a yearly plan
