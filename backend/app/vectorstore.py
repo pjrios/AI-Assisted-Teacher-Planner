@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Iterable
 
 import chromadb
@@ -12,8 +13,11 @@ settings = get_settings()
 
 class VectorStore:
     def __init__(self, collection_name: str = "yearly-plan") -> None:
+        persist_path = Path(settings.chroma_persist_directory).expanduser()
+        persist_path.mkdir(parents=True, exist_ok=True)
+
         self.client = chromadb.Client(
-            ChromaSettings(persist_directory=settings.chroma_persist_directory)
+            ChromaSettings(persist_directory=str(persist_path))
         )
         self.collection = self.client.get_or_create_collection(collection_name)
 

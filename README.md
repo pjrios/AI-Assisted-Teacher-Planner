@@ -65,15 +65,18 @@ requirements.txt    # Python dependencies
 4. **Ingest a plan with one command**
 
    Once your environment variables are configured, the `run_pipeline.py` script handles
-   parsing a yearly plan, exporting the normalized JSON, and storing semantic chunks in
-   Chroma:
+   bootstrapping the environment (ensuring the PostgreSQL schema exists and the Chroma
+   persistence directory is created), parsing a yearly plan, exporting the normalized
+   JSON, and storing semantic chunks in Chroma:
 
    ```bash
    python run_pipeline.py path/to/plan.docx --output-json data/plan.json
    ```
 
    The script prints the structured plan (or writes it to `--output-json`) and confirms the
-   number of chunks saved to the configured Chroma collection.
+   number of chunks saved to the configured Chroma collection. Ensure that the
+   `DATABASE_URL` points to a reachable PostgreSQL instance and that `OPENAI_API_KEY` is
+   populated; the pipeline will stop with a clear error if either requirement is missing.
 
 ## Key Workflows
 

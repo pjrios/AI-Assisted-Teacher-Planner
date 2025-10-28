@@ -18,3 +18,13 @@ def get_db() -> Generator[Session, None, None]:
         yield db
     finally:
         db.close()
+
+
+def init_database() -> None:
+    """Create database tables if they do not already exist."""
+
+    # Importing the models inside the function avoids circular imports while
+    # ensuring all SQLAlchemy metadata is registered before ``create_all`` runs.
+    from . import models  # noqa: F401 (imported for side effects)
+
+    Base.metadata.create_all(bind=engine)

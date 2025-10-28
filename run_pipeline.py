@@ -1,4 +1,4 @@
-"""Utility script to ingest a yearly plan and push it to the vector store."""
+"""Utility script to bootstrap the environment and ingest yearly plans."""
 from __future__ import annotations
 
 import argparse
@@ -6,8 +6,10 @@ import json
 from pathlib import Path
 from typing import Any
 
-from backend.app.ingestion.parser import ingest_yearly_plan
+from backend.app.config import get_settings
+from backend.app.db import init_database
 from backend.app.ingestion.embedder import EmbeddingService
+from backend.app.ingestion.parser import ingest_yearly_plan
 from backend.app.vectorstore import VectorStore
 
 
@@ -28,6 +30,19 @@ def _persist_vector_chunks(
     embeddings = embedder.embed_texts(texts)
     store.add_texts(ids=ids, texts=texts, embeddings=embeddings, metadatas=metadatas)
     return len(chunks)
+
+
+def _bootstrap_environment() -> None:
+    settings = get_settings()
+
+    if not settings.openai_api_key:
+        raise RuntimeError(
+            "OPENAI_API_KEY must be configured before running the ingestion pipeline."
+        )
+
+    print("⚙️ Ensuring database schema exists...", flush=True)
+    init_database()
+    print("✅ Database ready.")
 
 
 def main() -> None:
@@ -66,6 +81,8 @@ def main() -> None:
     plan_path: Path = args.plan_path.expanduser().resolve()
     if not plan_path.exists():
         raise FileNotFoundError(f"Plan file not found: {plan_path}")
+
+    _bootstrap_environment()
 
     print(f"➡️ Ingesting yearly plan from {plan_path}...", flush=True)
     ingestion_result = ingest_yearly_plan(plan_path)
